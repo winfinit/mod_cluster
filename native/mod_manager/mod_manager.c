@@ -2241,21 +2241,21 @@ static char *balancer_nonce_string(request_rec *r)
 static void context_command_string(request_rec *r, contextinfo_t *ou, char *Alias, char *JVMRoute)
 {
     if (ou->status == DISABLED) {
-        ap_rprintf(r, "<a href=\"%s?%sCmd=ENABLE-APP&Range=CONTEXT&%s\">Enable</a> ",
+        ap_rprintf(r, "<a class=\"btn btn-success btn-xs mc-context-enable\" href=\"%s?%sCmd=ENABLE-APP&Range=CONTEXT&%s\">Enable</a> ",
                    r->uri, balancer_nonce_string(r), context_string(r, ou, Alias, JVMRoute));
-        ap_rprintf(r, " <a href=\"%s?%sCmd=STOP-APP&Range=CONTEXT&%s\">Stop</a>",
+        ap_rprintf(r, " <a class=\"btn btn-danger btn-xs mc-context-stop\" href=\"%s?%sCmd=STOP-APP&Range=CONTEXT&%s\">Stop</a>",
                    r->uri, balancer_nonce_string(r), context_string(r, ou, Alias, JVMRoute));
     }
     if (ou->status == ENABLED) {
-        ap_rprintf(r, "<a href=\"%s?%sCmd=DISABLE-APP&Range=CONTEXT&%s\">Disable</a>",
+        ap_rprintf(r, "<a class=\"btn btn-warning btn-xs mc-context-disable\" href=\"%s?%sCmd=DISABLE-APP&Range=CONTEXT&%s\">Disable</a>",
                    r->uri, balancer_nonce_string(r), context_string(r, ou, Alias, JVMRoute));
-        ap_rprintf(r, " <a href=\"%s?%sCmd=STOP-APP&Range=CONTEXT&%s\">Stop</a>",
+        ap_rprintf(r, " <a class=\"btn btn-danger btn-xs mc-context-stop\" href=\"%s?%sCmd=STOP-APP&Range=CONTEXT&%s\">Stop</a>",
                    r->uri, balancer_nonce_string(r), context_string(r, ou, Alias, JVMRoute));
     }
     if (ou->status == STOPPED) {
-        ap_rprintf(r, "<a href=\"%s?%sCmd=ENABLE-APP&Range=CONTEXT&%s\">Enable</a> ",
+        ap_rprintf(r, "<a class=\"btn btn-success btn-xs mc-context-enable\" href=\"%s?%sCmd=ENABLE-APP&Range=CONTEXT&%s\">Enable</a> ",
                    r->uri, balancer_nonce_string(r), context_string(r, ou, Alias, JVMRoute));
-        ap_rprintf(r, "<a href=\"%s?%sCmd=DISABLE-APP&Range=CONTEXT&%s\">Disable</a>",
+        ap_rprintf(r, "<a class=\"btn btn-warning btn-xs mc-context-disable\" href=\"%s?%sCmd=DISABLE-APP&Range=CONTEXT&%s\">Disable</a>",
                    r->uri, balancer_nonce_string(r), context_string(r, ou, Alias, JVMRoute));
     }
 }
@@ -2267,20 +2267,20 @@ static char*node_string(request_rec *r, char *JVMRoute)
 }
 static void node_command_string(request_rec *r, char *JVMRoute)
 {
-    ap_rprintf(r, "<a href=\"%s?%sCmd=ENABLE-APP&Range=NODE&%s\">Enable Contexts</a> ",
+    ap_rprintf(r, "<a class=\"btn btn-success btn-xs mc-node-enable\" href=\"%s?%sCmd=ENABLE-APP&Range=NODE&%s\">Enable Contexts</a> ",
                r->uri, balancer_nonce_string(r), node_string(r, JVMRoute));
-    ap_rprintf(r, "<a href=\"%s?%sCmd=DISABLE-APP&Range=NODE&%s\">Disable Contexts</a> ",
+    ap_rprintf(r, "<a class=\"btn btn-warning btn-xs mc-node-disable\" href=\"%s?%sCmd=DISABLE-APP&Range=NODE&%s\">Disable Contexts</a> ",
                r->uri, balancer_nonce_string(r), node_string(r, JVMRoute));
-    ap_rprintf(r, "<a href=\"%s?%sCmd=STOP-APP&Range=NODE&%s\">Stop Contexts</a>",
+    ap_rprintf(r, "<a class=\"btn btn-danger btn-xs mc-node-stop\" href=\"%s?%sCmd=STOP-APP&Range=NODE&%s\">Stop Contexts</a>",
                r->uri, balancer_nonce_string(r), node_string(r, JVMRoute));
 }
 static void domain_command_string(request_rec *r, char *Domain)
 {
-    ap_rprintf(r, "<a href=\"%s?%sCmd=ENABLE-APP&Range=DOMAIN&Domain=%s\">Enable Nodes</a> ",
+    ap_rprintf(r, "<a class=\"btn btn-success btn-xs mc-domain-enable\" href=\"%s?%sCmd=ENABLE-APP&Range=DOMAIN&Domain=%s\">Enable Nodes</a> ",
                r->uri, balancer_nonce_string(r), Domain);
-    ap_rprintf(r, "<a href=\"%s?%sCmd=DISABLE-APP&Range=DOMAIN&Domain=%s\">Disable Nodes</a> ",
+    ap_rprintf(r, "<a class=\"btn btn-warning btn-xs mc-domain-warning\" href=\"%s?%sCmd=DISABLE-APP&Range=DOMAIN&Domain=%s\">Disable Nodes</a> ",
                r->uri, balancer_nonce_string(r), Domain);
-    ap_rprintf(r, "<a href=\"%s?%sCmd=STOP-APP&Range=DOMAIN&Domain=%s\">Stop Nodes</a>",
+    ap_rprintf(r, "<a class=\"btn btn-danger btn-xs mc-domain-danger\" href=\"%s?%sCmd=STOP-APP&Range=DOMAIN&Domain=%s\">Stop Nodes</a>",
                r->uri, balancer_nonce_string(r), Domain);
 }
 
@@ -2292,9 +2292,7 @@ static void manager_info_contexts(request_rec *r, int reduce_display, int allow_
     int size, i;
     int *id;
     /* Process the Contexts */
-    if (!reduce_display)
-        ap_rprintf(r, "<h3>Contexts:</h3>");
-    ap_rprintf(r, "<pre>");
+    ap_rprintf(r, "<table class=\"table table-hover\"><thead><tr><th>Context</th><th>Status</th><th>Requests</th><th>Actions</th></tr></thead><tbody>");
     size = loc_get_max_size_context();
     if (size == 0)
         return;
@@ -2319,12 +2317,12 @@ static void manager_info_contexts(request_rec *r, int reduce_display, int allow_
                 status = "STOPPED";
                 break;
         }
-        ap_rprintf(r, "%.*s, Status: %s Request: %d ", (int) sizeof(ou->context), ou->context, status, ou->nbrequests);
+        ap_rprintf(r, "<tr><td>%.*s</td><td>%s</td><td>%d</td><td>", (int) sizeof(ou->context), ou->context, status, ou->nbrequests);
         if (allow_cmd)
             context_command_string(r, ou, Alias, JVMRoute);
-        ap_rprintf(r, "\n");
+        ap_rprintf(r, "</td></tr>\n");
     }
-    ap_rprintf(r, "</pre>");
+    ap_rprintf(r, "</tbody></table>");
 }
 static void manager_info_hosts(request_rec *r, int reduce_display, int allow_cmd, int node, char *JVMRoute)
 {
@@ -2349,22 +2347,12 @@ static void manager_info_hosts(request_rec *r, int reduce_display, int allow_cmd
             /* if we've logged this already, contine */
             if (idChecker[i] == 1)
                 continue;
-            if (vhost && !reduce_display)
-                ap_rprintf(r, "</pre>");
-            if (!reduce_display)
-                ap_rprintf(r, "<h2> Virtual Host %d:</h2>", ou->vhost);
+                ap_rprintf(r, "<h3 class=\"mc-vhost-title\"> Virtual Host <span class=\"mc-vhost-name\">%d</span>:</h3>", ou->vhost);
             manager_info_contexts(r, reduce_display, allow_cmd, ou->node, ou->vhost, ou->host, JVMRoute);
-            if (reduce_display)
-                ap_rprintf(r, "Aliases: ");
-            else {
                 ap_rprintf(r, "<h3>Aliases:</h3>");
                 ap_rprintf(r, "<pre>");
-            }
             vhost = ou->vhost;
         
-            if (reduce_display)
-                ap_rprintf(r, "%.*s ", (int) sizeof(ou->host), ou->host);
-            else
                 ap_rprintf(r, "%.*s\n", (int) sizeof(ou->host), ou->host);
             
             /* Go ahead and check for any other later alias entries for this vhost and print them now */
@@ -2382,15 +2370,12 @@ static void manager_info_hosts(request_rec *r, int reduce_display, int allow_cmd
                 /* step the outer loop forward if we can */
                 if (i == j-1)
                     i++;
-                if (reduce_display)
-                    ap_rprintf(r, "%.*s ", (int) sizeof(pv->host), pv->host);
-                else
-                    ap_rprintf(r, "%.*s\n", (int) sizeof(pv->host), pv->host);
+                ap_rprintf(r, "%.*s\n", (int) sizeof(pv->host), pv->host);
             }
+            ap_rprintf(r, "</pre>");
         }
     }
-    if (size && !reduce_display)
-        ap_rprintf(r, "</pre>");
+     
 
 }
 static void manager_sessionid(request_rec *r)
@@ -2425,10 +2410,7 @@ static void manager_domain(request_rec *r, int reduce_display)
     int *id;
 
     /* Process the domain information: the removed node belonging to a domain are stored there */
-    if (reduce_display)
-        ap_rprintf(r, "<br/>LBGroup:");
-    else
-        ap_rprintf(r, "<h1>LBGroup:</h1>");
+    ap_rprintf(r, "<h1>LBGroup:</h1>");
     ap_rprintf(r, "<pre>");
     size = loc_get_max_size_domain();
     if (size == 0)
@@ -2557,13 +2539,10 @@ static void printproxy_stat(request_rec *r, int reduce_display, proxy_worker_sta
         status = "NOTOK";
     else
         status = "OK";
-    if (reduce_display)
-        ap_rprintf(r, " %s ", status);
-    else
-        ap_rprintf(r, ",Status: %s,Elected: %d,Read: %d,Transferred: %d,Connected: %d,Load: %d",
-               status,
-               (int) proxystat->elected, (int) proxystat->read, (int) proxystat->transferred,
-               (int) proxystat->busy, proxystat->lbfactor);
+    ap_rprintf(r, ",Status: %s,Elected: %d,Read: %d,Transferred: %d,Connected: %d,Load: %d",
+           status,
+           (int) proxystat->elected, (int) proxystat->read, (int) proxystat->transferred,
+           (int) proxystat->busy, proxystat->lbfactor);
 }
 /* Display module information */
 static void modules_info(request_rec *r)
@@ -2714,40 +2693,65 @@ static int manager_info(request_rec *r)
     }
     
     ap_set_content_type(r, "text/html; charset=ISO-8859-1");
-    ap_rputs(DOCTYPE_HTML_3_2
-             "<html><head>\n<title>Mod_cluster Status</title>\n</head><body>\n",
-             r);
-    ap_rvputs(r, "<h1>", MOD_CLUSTER_EXPOSED_VERSION, "</h1>", NULL);
+    ap_rvputs(r, "<!DOCTYPE html>\n\
+<html lang=\"en\">\n\
+                <head>\n \
+                    <meta charset=\"utf-8\"/> \
+                    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"/> \
+                    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/> \
+                    <link href=\"//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css\" rel=\"stylesheet\" type=\"text/css\" /> \
+                    <!--[if lt IE 9]>\
+                          <script src=\"//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js\"></script>\
+                          <script src=\"//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js\"></script>\
+                    <![endif]--> \
+                    <script src=\"//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js\"></script> \
+                    <script src=\"//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js\"></script>\
+                    <title>Mod_cluster Status</title>\n \
+                </head> \
+                <body>\
+               <div class=\"navbar navbar-inverse\" role=\"navigation\">\
+                  <div class=\"container-fluid\">\
+                    <div class=\"navbar-header\">\
+                              <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\">\
+                                <span class=\"sr-only\">Toggle navigation</span>\
+                                <span class=\"icon-bar\"></span>\
+                                <span class=\"icon-bar\"></span>\
+                                <span class=\"icon-bar\"></span>\
+                              </button>\
+                              <a class=\"navbar-brand\" href=\"", r->uri, "\">", MOD_CLUSTER_EXPOSED_VERSION , "</a> \
+                    </div>\
+                    <div class=\"navbar-collapse collapse\"> \
+                      <ul class=\"nav navbar-nav\">\
+                        <li class=\"active\"><a href=\"", r->uri, "?", balancer_nonce_string(r), "\">Home</a></li>\
+                        <li><a href=\"", r->uri, "?", balancer_nonce_string(r), "Cmd=DUMP&Range=ALL\">Dump</a></li>\
+                        <li><a href=\"", r->uri, "?", balancer_nonce_string(r), "Cmd=INFO&Range=ALL\">Info</a></li>\
+                      </ul>\
+                      <ul class=\"nav navbar-nav navbar-right\"> \
+                        <li><a href=\"", r->uri, "?", balancer_nonce_string(r), "refresh=10\"> <span class=\"glyphicon glyphicon-refresh\"></span> Auto Refresh</a></li>\
+                      </ul>\
+                    </div>\
+                  </div>\
+                </div> \
+                <div class=\"container-fluid\" role=\"main\">\n", NULL);
 
     if (errstring) {
-        ap_rvputs(r, "<h1> Command failed: ", errstring , "</h1>\n", NULL);
+        ap_rvputs(r, "<h1 class=\"mc-command-failure\"> Command failed: ", errstring , "</h1>\n", NULL);
         ap_rvputs(r, " <a href=\"", r->uri, "\">Continue</a>\n", NULL);
-        ap_rputs("</body></html>\n", r);
+        ap_rputs("</div></body></html>\n", r);
         return OK;
     }
 
     /* Advertise information */
     if (mconf->allow_display) {
-        ap_rputs("start of \"httpd.conf\" configuration<br/>", r); 
+        ap_rputs("<div class=\"panel panel-primary\"> \
+                        <div class=\"panel-heading\">Allow Display</div>\
+                        <div class=\"panel-body\">", r); 
         modules_info(r);
         if (advertise_info != NULL)
             advertise_info(r);
-        ap_rputs("end of \"httpd.conf\" configuration<br/><br/>", r);
+        ap_rputs("</div></div>", r);
     }
 
-    ap_rvputs(r, "<a href=\"", r->uri, "?", balancer_nonce_string(r),
-                 "refresh=10",
-                 "\">Auto Refresh</a>", NULL);
-
-    ap_rvputs(r, " <a href=\"", r->uri, "?", balancer_nonce_string(r),
-                 "Cmd=DUMP&Range=ALL",
-                 "\">show DUMP output</a>", NULL);
-
-    ap_rvputs(r, " <a href=\"", r->uri, "?", balancer_nonce_string(r),
-                 "Cmd=INFO&Range=ALL",
-                 "\">show INFO output</a>", NULL);
-
-    ap_rputs("\n", r);
 
     sizesessionid = loc_get_max_size_sessionid();
 
@@ -2776,72 +2780,65 @@ static int manager_info(request_rec *r)
         char *pptr = (char *) ou;
 
         if (strcmp(domain, ou->mess.Domain) != 0) {
-            if (mconf->reduce_display)
-                ap_rprintf(r, "<br/><br/>LBGroup %.*s: ", (int) sizeof(ou->mess.Domain), ou->mess.Domain);
-            else
-                ap_rprintf(r, "<h1> LBGroup %.*s: ", (int) sizeof(ou->mess.Domain), ou->mess.Domain);
-            domain = ou->mess.Domain;
-            if (mconf->allow_cmd)
-                domain_command_string(r, domain);
-            if (!mconf->reduce_display)
-                ap_rprintf(r, "</h1>\n");
-        }
-        if (mconf->reduce_display)
-            ap_rprintf(r, "<br/><br/>Node %.*s ",
-                   (int) sizeof(ou->mess.JVMRoute), ou->mess.JVMRoute);
-        else 
-            ap_rprintf(r, "<h1> Node %.*s (%.*s://%.*s:%.*s): </h1>\n",
-                   (int) sizeof(ou->mess.JVMRoute), ou->mess.JVMRoute,
-                   (int) sizeof(ou->mess.Type), ou->mess.Type,
-                   (int) sizeof(ou->mess.Host), ou->mess.Host,
-                   (int) sizeof(ou->mess.Port), ou->mess.Port);
-        pptr = pptr + ou->offset;
-        if (mconf->reduce_display) {
-#if AP_MODULE_MAGIC_AT_LEAST(20101223,1)
-            printproxy_stat(r, mconf->reduce_display, (proxy_worker_shared *) pptr);
-#else
-            printproxy_stat(r, mconf->reduce_display, (proxy_worker_stat *) pptr);
-#endif
-        }
 
-        if (mconf->allow_cmd)
-            node_command_string(r, ou->mess.JVMRoute);
-
-        if (!mconf->reduce_display) {
-            ap_rprintf(r, "<br/>\n");
-            ap_rprintf(r, "Balancer: %.*s,LBGroup: %.*s", (int) sizeof(ou->mess.balancer), ou->mess.balancer,
-                   (int) sizeof(ou->mess.Domain), ou->mess.Domain);
-
-            flushpackets = "Off";
-            switch (ou->mess.flushpackets) {
-                case flush_on:
-                    flushpackets = "On";
-                    break;
-                case flush_auto:
-                    flushpackets = "Auto";
+            /* that means that we are not in our first itteration and domain was set */
+            if ( strlen(domain) > 0  ) {
+                ap_rprintf(r, "</div></div>\n");
             }
-            ap_rprintf(r, ",Flushpackets: %s,Flushwait: %d,Ping: %d,Smax: %d,Ttl: %d",
-                   flushpackets, ou->mess.flushwait,
-                   (int) ou->mess.ping, ou->mess.smax, (int) ou->mess.ttl);
+            ap_rprintf(r, "<div class=\"panel panel-primary\"><div class=\"panel-heading\">LBGroup %.*s ", (int) sizeof(ou->mess.Domain), ou->mess.Domain);
+            domain = ou->mess.Domain;
+            if (mconf->allow_cmd) {
+                ap_rprintf(r, "<div class=\"pull-right\">");
+                domain_command_string(r, domain);
+                ap_rprintf(r, "</div>");
+            }
+            ap_rprintf(r, "</div><div class=\"panel-body\">");
         }
 
-        if (mconf->reduce_display)
-            ap_rprintf(r, "<br/>\n");
-        else {
-#if AP_MODULE_MAGIC_AT_LEAST(20101223,1)
-            printproxy_stat(r, mconf->reduce_display, (proxy_worker_shared *) pptr);
-#else
-            printproxy_stat(r, mconf->reduce_display, (proxy_worker_stat *) pptr);
-#endif
+
+        ap_rprintf(r, "<div class=\"panel panel-primary\"><div class=\"panel-heading\">Node %.*s (%.*s://%.*s:%.*s)",
+               (int) sizeof(ou->mess.JVMRoute), ou->mess.JVMRoute,
+               (int) sizeof(ou->mess.Type), ou->mess.Type,
+               (int) sizeof(ou->mess.Host), ou->mess.Host,
+               (int) sizeof(ou->mess.Port), ou->mess.Port);
+        if (mconf->allow_cmd) {
+            ap_rprintf(r, "<div class=\"pull-right\">");
+            node_command_string(r, ou->mess.JVMRoute);
+            ap_rprintf(r, "</div>");
         }
+
+        ap_rputs("</div> <div class=\"panel-body\">", r);
+
+        pptr = pptr + ou->offset;
+
+        ap_rprintf(r, "Balancer: %.*s,LBGroup: %.*s", (int) sizeof(ou->mess.balancer), ou->mess.balancer,
+               (int) sizeof(ou->mess.Domain), ou->mess.Domain);
+
+        flushpackets = "Off";
+        switch (ou->mess.flushpackets) {
+            case flush_on:
+                flushpackets = "On";
+                break;
+            case flush_auto:
+                flushpackets = "Auto";
+        }
+        ap_rprintf(r, ",Flushpackets: %s,Flushwait: %d,Ping: %d,Smax: %d,Ttl: %d",
+               flushpackets, ou->mess.flushwait,
+               (int) ou->mess.ping, ou->mess.smax, (int) ou->mess.ttl);
+
+#if AP_MODULE_MAGIC_AT_LEAST(20101223,1)
+        printproxy_stat(r, mconf->reduce_display, (proxy_worker_shared *) pptr);
+#else
+        printproxy_stat(r, mconf->reduce_display, (proxy_worker_stat *) pptr);
+#endif
 
         if (sizesessionid) {
             ap_rprintf(r, ",Num sessions: %d",  count_sessionid(r, ou->mess.JVMRoute));
         }
-        ap_rprintf(r, "\n");
 
         /* Process the Vhosts */
         manager_info_hosts(r, mconf->reduce_display, mconf->allow_cmd, ou->mess.id, ou->mess.JVMRoute); 
+        ap_rprintf(r, "</div></div>");
     }
     /* Display the sessions */
     if (sizesessionid)
@@ -2850,8 +2847,12 @@ static int manager_info(request_rec *r)
     manager_domain(r, mconf->reduce_display);
 #endif
 
+            /* we are on the last iterration of lb group */
+            if ( strlen(domain) > 0 &&  i == size  ) {
+                ap_rprintf(r, "</div></div>\n");
+            }
 
-    ap_rputs("</body></html>\n", r);
+    ap_rputs("</div></body></html>\n", r);
     return OK;
 }
 
